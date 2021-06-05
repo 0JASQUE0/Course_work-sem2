@@ -47,5 +47,7 @@ int main()
 	}
 	cout << "Максимальный поток графа равен: " << maxFlow;
 
+	fin.close();
+
 	return 0;
 }

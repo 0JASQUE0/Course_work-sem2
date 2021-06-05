@@ -14,7 +14,7 @@ namespace UnitTest1
 	{
 	public:
 		
-		TEST_METHOD(vertexesSearchTest)
+		TEST_METHOD(vertexesSearchTest1)
 		{
 			ifstream fin;
 			fin.open("D:\\Прога 4 сем лабы\\Курсовая работа\\UnitTest1\\test.txt", ios::in);
@@ -31,7 +31,23 @@ namespace UnitTest1
 			fin.close();
 		}
 
-		TEST_METHOD(matrixFillingTest)
+		TEST_METHOD(vertexesSearchTest2)
+		{
+			ifstream fin;
+			fin.open("D:\\Прога 4 сем лабы\\Курсовая работа\\UnitTest1\\testIncorrect1.txt", ios::in);
+			LinkedList<char>* test = new LinkedList<char>;
+			try
+			{
+				vertexesSearch(test, fin);
+			}
+			catch (const char* exception)
+			{
+				Assert::AreEqual(exception, "Incorrect input");
+			}
+			fin.close();
+		}
+
+		TEST_METHOD(matrixFillingTest1)
 		{
 			ifstream fin;
 			fin.open("D:\\Прога 4 сем лабы\\Курсовая работа\\UnitTest1\\test.txt", ios::in);
@@ -61,6 +77,40 @@ namespace UnitTest1
 					Assert::IsTrue(capacityMatrix[i][j] == testMatrix[i][j]);
 				}
 			}
+			fin.close();
+		}
+
+		TEST_METHOD(matrixFillingTest2)
+		{
+			ifstream fin;
+			fin.open("D:\\Прога 4 сем лабы\\Курсовая работа\\UnitTest1\\testIncorrect2.txt", ios::in);
+			LinkedList<char>* test = new LinkedList<char>;
+			vertexesSearch(test, fin);
+			size_t n = test->get_size();
+
+			int** capacityMatrix = new int* [n];
+			for (size_t i = 0; i < n; i++) {
+				capacityMatrix[i] = new int[n];
+			}
+			for (size_t i = 0; i < n; i++) {
+				for (size_t j = 0; j < n; j++) {
+					capacityMatrix[i][j] = 0;
+				}
+			}
+
+			fin.clear();
+			fin.seekg(0);
+
+			try
+			{
+				matrixFilling(test, fin, capacityMatrix);
+			}
+			catch (const char* exception)
+			{
+				Assert::AreEqual(exception, "Incorrect input");
+			}
+
+			fin.close();
 		}
 
 		TEST_METHOD(EdmondsKarpAlgorithmTest)
@@ -88,6 +138,7 @@ namespace UnitTest1
 			int maxFlow = EdmondsKarpAlgorithm(capacityMatrix, 0, n - 1, n);
 
 			Assert::IsTrue(maxFlow == 5);
+			fin.close();
 		}
 	};
 }

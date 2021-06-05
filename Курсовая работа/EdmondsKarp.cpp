@@ -21,6 +21,9 @@ void vertexesSearch(LinkedList<char>* listOfCities, ifstream& fin)
 			if (counter == 2) {
 				break;
 			}
+			if (str[i] != ' ') {
+				throw("Incorrect input");
+			}
 		}
 	}
 }
@@ -43,73 +46,78 @@ void matrixFilling(LinkedList<char>* listOfVertexes, ifstream& fin, int** capaci
 				indexJ = listOfVertexes->find(tempChar);
 			}
 			if (counter == 2) {
-				capacityMatrix[indexI][indexJ] = int(tempChar) - int('0');
+				if (int(tempChar) < int('0') || int(tempChar) > int('9')) {
+					throw("Incorrect input");
+				}
+				else {
+					capacityMatrix[indexI][indexJ] = int(tempChar) - int('0');
+				}
 			}
 			counter++;
 		}
 	}
 }
 
-bool breadthFirstSearch(int** graph, int s, int t, int* parent, size_t size)
+bool breadthFirstSearch(int** flowMatrix, int source, int target, int* parent, size_t size)
 {
-	bool* visited = new bool[size];
+	bool* visitedVertexes = new bool[size];
 	for (size_t i = 0; i < size; i++) {
-		visited[i] = false;
+		visitedVertexes[i] = false;
 	}
 
 	Queue<int> queue;
-	queue.push(s);
-	visited[s] = true;
-	parent[s] = -1;
+	queue.push(source);
+	visitedVertexes[source] = true;
+	parent[source] = -1;
 
 	while (!queue.empty()) {
-		int cur = queue.first();
+		int currentVertex = queue.first();
 		queue.pop();
 		for (size_t i = 0; i < size; i++) {
-			if (visited[i] == false && graph[cur][i] > 0) {
+			if (visitedVertexes[i] == false && flowMatrix[currentVertex][i] > 0) {
 				queue.push(i);
-				parent[i] = cur;
-				visited[i] = true;
+				parent[i] = currentVertex;
+				visitedVertexes[i] = true;
 			}
 		}
 	}
 
-	return visited[t];
+	return visitedVertexes[target];
 }
 
-int EdmondsKarpAlgorithm(int** capacityMatrix, int s, int t, size_t size)
+int EdmondsKarpAlgorithm(int** capacityMatrix, int source, int target, size_t size)
 {
-	int cur;
-	int** graph = new int* [size];
+	int currentVertex;
+	int** flowMatrix = new int* [size];
 	for (size_t i = 0; i < size; i++) {
-		graph[i] = new int[size];
+		flowMatrix[i] = new int[size];
 	}
 	for (size_t i = 0; i < size; i++) {
 		for (size_t j = 0; j < size; j++) {
-			graph[i][j] = capacityMatrix[i][j];
+			flowMatrix[i][j] = capacityMatrix[i][j];
 		}
 	}
 
 	int* parent = new int[size];
 	int maxFlow = 0;
+	int pathFlow;
 
-	while (breadthFirstSearch(graph, s, t, parent, size)) {
-		int pathFlow = 1e9;
+	while (breadthFirstSearch(flowMatrix, source, target, parent, size)) {
+		pathFlow = 1e9;
 
-		for (int i = t; i != s; i = parent[i]) {
-			cur = parent[i];
-			if (pathFlow > graph[cur][i]) {
-				pathFlow = graph[cur][i];
+		for (int i = target; i != source; i = parent[i]) {
+			currentVertex = parent[i];
+			if (pathFlow > flowMatrix[currentVertex][i]) {
+				pathFlow = flowMatrix[currentVertex][i];
 			}
 		}
-		for (int i = t; i != s; i = parent[i]) {
-			cur = parent[i];
-			graph[cur][i] -= pathFlow;
-			graph[i][cur] += pathFlow;
+		for (int i = target; i != source; i = parent[i]) {
+			currentVertex = parent[i];
+			flowMatrix[currentVertex][i] -= pathFlow;
+			flowMatrix[i][currentVertex] += pathFlow;
 		}
 
 		maxFlow += pathFlow;
 	}
-	
 	return maxFlow;
 }
